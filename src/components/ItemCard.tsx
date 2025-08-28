@@ -35,23 +35,38 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
 
   useEffect(() => {
     const updateCountdown = () => {
-      const now = new Date();
-      const nextReset = new Date();
-      nextReset.setUTCHours(0, 0, 0, 0);
-      if (now >= nextReset) nextReset.setUTCDate(nextReset.getUTCDate() + 1);
+      const now = new Date(); // now is UTC
+      const expirationDate = new Date(item.outDate); // expirationDate is UTC
+      
+      if (isNaN(expirationDate.getTime())) {
+        setTimeLeft("Fecha no disponible");
+        return;
+      }
 
-      const diff = nextReset.getTime() - now.getTime();
-      const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
-      const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-      const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+      
+      const diff = expirationDate.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setTimeLeft("Expirado");
+        return;
+      }
 
-      setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      if (days > 0) {
+        setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+      } else {
+        setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+      }
     };
 
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [item.outDate]);
 
   const rareza = display.rarity?.toLowerCase() || "common";
   const estilo = estilosPorRareza[rareza] || "border-slate-700";

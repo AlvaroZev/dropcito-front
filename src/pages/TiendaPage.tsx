@@ -89,6 +89,7 @@ export interface ShopEntry {
   regularPrice: number;
   finalPrice: number;
   offerId?: string;
+  outDate: string;
   itemDisplay: {
     name: string;
     type: string;
@@ -150,6 +151,7 @@ const TiendaPage: React.FC = () => {
           regularPrice: entry.regularPrice ?? 0,
           finalPrice: entry.finalPrice ?? 0,
           offerId: entry.offerId ?? "unknown-offer",
+          outDate: entry.outDate ?? "",
           itemDisplay: {
             name,
             type,
