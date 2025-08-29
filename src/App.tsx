@@ -5,6 +5,7 @@ import TiendaPage from './pages/TiendaPage';
 function App() {
   const [currentPage, setCurrentPage] = useState('tienda');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -22,8 +23,12 @@ function App() {
     setIsMobileMenuOpen(false); // Close mobile menu when a page is selected
   };
 
+  const toggleTheme = () => {
+    setIsDarkTheme(!isDarkTheme);
+  };
+
   return (
-    <div className="App">
+    <div className={`App ${isDarkTheme ? 'dark-theme' : ''}`}>
       <nav className="navbar">
         <div className="nav-brand">
           <img src="/logo.png" alt="Dropcito Logo" className="nav-logo" />
@@ -59,6 +64,15 @@ function App() {
             onClick={() => handleNavClick('contactanos')}
           >
             Contactanos
+          </button>
+          
+          {/* Dark Theme Toggle Button */}
+          <button 
+            className="theme-toggle-button"
+            onClick={toggleTheme}
+            aria-label={isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {isDarkTheme ? '☀️' : '🌙'}
           </button>
         </div>
       </nav>
