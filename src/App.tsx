@@ -4,6 +4,7 @@ import TiendaPage from './pages/TiendaPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('tienda');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -16,6 +17,11 @@ function App() {
     }
   };
 
+  const handleNavClick = (page: string) => {
+    setCurrentPage(page);
+    setIsMobileMenuOpen(false); // Close mobile menu when a page is selected
+  };
+
   return (
     <div className="App">
       <nav className="navbar">
@@ -23,22 +29,34 @@ function App() {
           <img src="/logo.png" alt="Dropcito Logo" className="nav-logo" />
           <span>Dropcito</span>
         </div>
-        <div className="nav-links">
+        
+        {/* Mobile menu button */}
+        <button 
+          className={`mobile-menu-button ${isMobileMenuOpen ? 'active' : ''}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle mobile menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
           <button 
             className={`nav-link ${currentPage === 'tienda' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('tienda')}
+            onClick={() => handleNavClick('tienda')}
           >
             Tienda
           </button>
           <button 
             className={`nav-link ${currentPage === 'nosotros' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('nosotros')}
+            onClick={() => handleNavClick('nosotros')}
           >
             Nosotros
           </button>
           <button 
             className={`nav-link ${currentPage === 'contactanos' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('contactanos')}
+            onClick={() => handleNavClick('contactanos')}
           >
             Contactanos
           </button>

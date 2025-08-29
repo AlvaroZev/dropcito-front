@@ -105,7 +105,7 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
   };
 
   return (
-    <div className={`item-card ${estilo}`}>
+    <div className={`item-card ${estilo} responsive-card`}>
       <img
         style={{
           background: `linear-gradient(to bottom, ${fixedColor}, ${
@@ -119,38 +119,38 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
         }}
         src={display.image}
         alt={display.name}
-        className="item-image"
+        className="item-image responsive-image"
         loading="lazy"
       />
 
-      <div className="item-content">
-        <h2 className="item-name" title={display.name}>
+      <div className="item-content responsive-content">
+        <h2 className="item-name responsive-name" title={display.name}>
           {display.name}
         </h2>
 
-        <div className="item-price">
+        <div className="item-price responsive-price">
           <img
             src="https://static.wikia.nocookie.net/fortnite/images/e/eb/V-Bucks_-_Icon_-_Fortnite.png"
             alt="V-Bucks"
-            className="vbucks-icon"
+            className="vbucks-icon responsive-vbucks-icon"
           />
-          <p className="price-text">{display.vBucks} PAVOS</p>
+          <p className="price-text responsive-price-text">{display.vBucks} PAVOS</p>
         </div>
 
-        <div className="pen-prices">
-          <p className="pen-price-regular">S/ {penPrice.toFixed(2)}</p>
-          <p className="pen-price-discounted">S/ {penDiscountedPrice.toFixed(2)}</p>
+        <div className="pen-prices responsive-pen-prices">
+          <p className="pen-price-regular responsive-pen-regular">S/ {penPrice.toFixed(2)}</p>
+          <p className="pen-price-discounted responsive-pen-discounted">S/ {penDiscountedPrice.toFixed(2)}</p>
         </div>
 
-        <p className="time-left">
+        <p className="time-left responsive-time">
           ⏳ Disponible por: {timeLeft}
         </p>
       </div>
 
       {/* Buy Now Overlay */}
-      <div className="buy-overlay">
+      <div className="buy-overlay responsive-overlay">
         <button 
-          className="buy-button"
+          className="buy-button responsive-buy-button"
           onClick={handleBuyClick}
         >
           Buy Now
