@@ -105,6 +105,157 @@ export interface ShopEntry {
   };
 }
 
+// Fortnite accounts configuration
+const generateFortniteAccounts = (): string[] => {
+  const accounts: string[] = [];
+  for (let i = 1; i <= 10; i++) {
+    accounts.push(`DropCito${i.toString().padStart(4, '0')}`);
+  }
+  return accounts;
+};
+
+const FortniteAccountsPrompt: React.FC = () => {
+  const [accounts] = useState<string[]>(generateFortniteAccounts());
+  const [showAll, setShowAll] = useState(false);
+  const [showUsernameForm, setShowUsernameForm] = useState(false);
+  const [username, setUsername] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const displayedAccounts = showAll ? accounts : accounts.slice(0, 3);
+
+  const handleAccountClick = (accountName: string) => {
+    setShowUsernameForm(true);
+  };
+
+  const handleUsernameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!username.trim()) return;
+    
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    
+    try {
+      const response = await fetch('https://backend.com/addtofriends', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          itemName: "Fortnite Account Addition",
+          itemPrice: "0.00"
+        }),
+      });
+      
+      if (response.ok) {
+        setSubmitStatus("success");
+        setTimeout(() => {
+          setShowUsernameForm(false);
+          setUsername("");
+          setSubmitStatus("idle");
+        }, 2000);
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      console.error('Error submitting friend request:', error);
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setShowUsernameForm(false);
+    setUsername("");
+    setSubmitStatus("idle");
+  };
+
+  if (showUsernameForm) {
+    return (
+      <div className="fortnite-accounts-prompt">
+        <div className="accounts-header">
+          <h2>🎮 Agregar en Fortnite</h2>
+          <p>Comparte tu username para que te agreguemos</p>
+        </div>
+        
+        <form onSubmit={handleUsernameSubmit} className="friend-request-form">
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Tu username de Fortnite"
+            className="username-input"
+            disabled={isSubmitting}
+            required
+          />
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting || !username.trim()}
+          >
+            {isSubmitting ? "Enviando..." : "Enviar"}
+          </button>
+        </form>
+        
+        {submitStatus === "success" && (
+          <div className="success-message">
+            ✅ ¡Solicitud enviada! Te agregaremos pronto.
+          </div>
+        )}
+        {submitStatus === "error" && (
+          <div className="error-message">
+            ❌ Error al enviar. Intenta de nuevo.
+          </div>
+        )}
+        
+        <button 
+          className="back-button"
+          onClick={handleCloseForm}
+          title="Volver"
+        >
+          ← Volver a las cuentas
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fortnite-accounts-prompt">
+      <div className="accounts-header">
+        <h2>🎮 Agrega nuestros cuentas en Fortnite</h2>
+        <p>¡Juega con nosotros y obtén mejores precios!</p>
+      </div>
+      
+      <div className="accounts-list">
+        {displayedAccounts.map((account, index) => (
+          <div 
+            key={account} 
+            className="account-item"
+            onClick={() => handleAccountClick(account)}
+            title={`Haz clic para agregar ${account}`}
+          >
+            <span className="account-number">#{index + 1}</span>
+            <span className="account-name">{account}</span>
+            <span className="account-click-hint">👆</span>
+          </div>
+        ))}
+      </div>
+      
+      {accounts.length > 3 && (
+        <button 
+          className="show-more-button"
+          onClick={() => setShowAll(!showAll)}
+        >
+          {showAll ? 'Mostrar menos' : `Mostrar ${accounts.length - 3} más`}
+        </button>
+      )}
+    </div>
+  );
+};
+
 const TiendaPage: React.FC = () => {
   const [itemsByCategory, setItemsByCategory] = useState<Record<string, ShopEntry[]>>({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -180,9 +331,7 @@ const TiendaPage: React.FC = () => {
   };
 
   const handleBuy = (item: ShopEntry) => {
-    // TODO: Implement buy functionality
-    console.log("Buying item:", item.itemDisplay.name);
-    alert(`Buying ${item.itemDisplay.name} for ${item.itemDisplay.vBucks} V-Bucks!`);
+    // TODO: Implement buy functionality, already implemented in ItemCard.tsx
   };
 
   return (
@@ -190,6 +339,9 @@ const TiendaPage: React.FC = () => {
       <div className="page-content">
         <div className="tienda-container">
           <h1 className="tienda-title">🛍️ Tienda de Fortnite</h1>
+          
+          {/* Fortnite Accounts Prompt */}
+          <FortniteAccountsPrompt />
           
           <input
             type="text"
