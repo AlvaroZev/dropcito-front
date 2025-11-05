@@ -7,7 +7,7 @@ A React application for displaying Fortnite item shop with WhatsApp integration 
 To configure the WhatsApp integration, create a `.env.local` file in the root directory with the following content:
 
 ```
-REACT_APP_WHATSAPP_NUMBER=51991138064
+REACT_APP_WHATSAPP_NUMBER=51999845166
 ```
 
 Replace `51991138064` with your actual WhatsApp number in international format (without +, spaces, or special characters).
