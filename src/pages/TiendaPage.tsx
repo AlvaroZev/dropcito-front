@@ -271,8 +271,8 @@ const FortniteAccountsPrompt: React.FC = () => {
   return (
     <div className="fortnite-accounts-prompt">
       <div className="accounts-header">
-        <h2>🎮 Agrega nuestros cuentas en Fortnite</h2>
-        <p>¡Juega con nosotros y obtén mejores precios!</p>
+        <h2>🎮 Agrega nuestras cuentas en Fortnite</h2>
+        <p>¡Si haces click en el nombre y dejas tu cuenta, te agregaremos!</p>
       </div>
       
       <div className="accounts-list">

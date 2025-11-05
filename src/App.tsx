@@ -13,9 +13,23 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'nosotros':
-        return <div className="page-content nosotros-page">Nosotros Page</div>;
+        return (
+          <div className="page-content nosotros-page">
+            <div className="construction-container">
+              <img src="/building.webp" alt="En construcción" className="construction-image" />
+              <h2 className="construction-text">En construcción</h2>
+            </div>
+          </div>
+        );
       case 'contactanos':
-        return <div className="page-content contactanos-page">Contactanos Page</div>;
+        return (
+          <div className="page-content contactanos-page">
+            <div className="construction-container">
+              <img src="/building.webp" alt="En construcción" className="construction-image" />
+              <h2 className="construction-text">En construcción</h2>
+            </div>
+          </div>
+        );
       default:
         return <TiendaPage selectedCountry={selectedCountry} />;
     }
@@ -81,7 +95,7 @@ function App() {
             title={`País: ${selectedCountry === 'peru' ? 'Perú' : 'Argentina'}`}
           >
             <img 
-              src={selectedCountry === 'peru' ? '/per.png' : '/arg.webp'} 
+              src={selectedCountry === 'peru' ? '/per.png' : '/arg.jpg'} 
               alt={selectedCountry === 'peru' ? 'Perú' : 'Argentina'}
               className="country-flag-icon"
             />
