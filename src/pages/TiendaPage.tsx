@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import ItemCard from "../components/ItemCard";
+import { Country } from "../App";
+import { getAuthToken, clearAuthToken, API_BASE_URL } from "../utils/auth";
 
 // --- Types ---
 export type RawEntry = {
@@ -85,6 +87,9 @@ export type RawEntry = {
   };
 };
 
+// Accounts Available
+const accountsAvailable = 1
+
 export interface ShopEntry {
   regularPrice: number;
   finalPrice: number;
@@ -108,7 +113,7 @@ export interface ShopEntry {
 // Fortnite accounts configuration
 const generateFortniteAccounts = (): string[] => {
   const accounts: string[] = [];
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= accountsAvailable; i++) {
     accounts.push(`DropCito${i.toString().padStart(4, '0')}`);
   }
   return accounts;
@@ -137,19 +142,29 @@ const FortniteAccountsPrompt: React.FC = () => {
     setSubmitStatus("idle");
     
     try {
-      const response = await fetch('https://backend.com/addtofriends', {
+      // Get authentication token
+      const token = await getAuthToken();
+      
+      if (!token) {
+        console.error('Failed to obtain authentication token');
+        setSubmitStatus("error");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/sendfriendrequest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          username: username.trim(),
-          itemName: "Fortnite Account Addition",
-          itemPrice: "0.00"
+          display_name: username.trim()
         }),
       });
       
       if (response.ok) {
+        const data = await response.json();
         setSubmitStatus("success");
         setTimeout(() => {
           setShowUsernameForm(false);
@@ -157,7 +172,38 @@ const FortniteAccountsPrompt: React.FC = () => {
           setSubmitStatus("idle");
         }, 2000);
       } else {
-        setSubmitStatus("error");
+        // If unauthorized, clear token and try again
+        if (response.status === 401) {
+          clearAuthToken();
+          const newToken = await getAuthToken();
+          if (newToken) {
+            // Retry with new token
+            const retryResponse = await fetch(`${API_BASE_URL}/sendfriendrequest`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${newToken}`
+              },
+              body: JSON.stringify({
+                display_name: username.trim()
+              }),
+            });
+            if (retryResponse.ok) {
+              setSubmitStatus("success");
+              setTimeout(() => {
+                setShowUsernameForm(false);
+                setUsername("");
+                setSubmitStatus("idle");
+              }, 2000);
+            } else {
+              setSubmitStatus("error");
+            }
+          } else {
+            setSubmitStatus("error");
+          }
+        } else {
+          setSubmitStatus("error");
+        }
       }
     } catch (error) {
       console.error('Error submitting friend request:', error);
@@ -256,7 +302,11 @@ const FortniteAccountsPrompt: React.FC = () => {
   );
 };
 
-const TiendaPage: React.FC = () => {
+interface TiendaPageProps {
+  selectedCountry: Country;
+}
+
+const TiendaPage: React.FC<TiendaPageProps> = ({ selectedCountry }) => {
   const [itemsByCategory, setItemsByCategory] = useState<Record<string, ShopEntry[]>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -330,9 +380,9 @@ const TiendaPage: React.FC = () => {
     }
   };
 
-  const handleBuy = (item: ShopEntry) => {
+  const handleBuy = useCallback((item: ShopEntry) => {
     // TODO: Implement buy functionality, already implemented in ItemCard.tsx
-  };
+  }, []);
 
   return (
     <div className="tienda-page">
@@ -364,8 +414,13 @@ const TiendaPage: React.FC = () => {
                   <div key={category} className="category-section">
                     <h3 className="category-title">{category}</h3>
                     <div className="items-grid">
-                      {filtered.map((item, idx) => (
-                        <ItemCard key={idx} item={item} onBuy={handleBuy} />
+                      {filtered.map((item) => (
+                        <ItemCard 
+                          key={item.offerId || item.itemDisplay.name} 
+                          item={item} 
+                          onBuy={handleBuy} 
+                          country={selectedCountry} 
+                        />
                       ))}
                     </div>
                   </div>

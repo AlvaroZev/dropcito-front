@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import ItemCard from './ItemCard';
 import { ShopEntry } from '../pages/TiendaPage';
+import { Country } from '../App';
 
 // Mock the environment variable
 const originalEnv = process.env;
@@ -31,12 +32,12 @@ const mockItem : ShopEntry = {
 
 describe('ItemCard', () => {
   test('shows buy button initially', () => {
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     expect(screen.getByText('Comprar')).toBeInTheDocument();
   });
 
   test('shows WhatsApp button after clicking buy', () => {
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -53,7 +54,7 @@ describe('ItemCard', () => {
       writable: true
     });
 
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -68,7 +69,7 @@ describe('ItemCard', () => {
   });
 
   test('closes WhatsApp buttons when close button is clicked', () => {
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -88,7 +89,7 @@ describe('ItemCard', () => {
       writable: true
     });
 
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -109,7 +110,7 @@ describe('ItemCard', () => {
   });
 
   test('shows Fortnite friend request form after clicking Fortnite button', () => {
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -132,7 +133,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -171,7 +172,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -203,7 +204,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -227,7 +228,7 @@ describe('ItemCard', () => {
   });
 
   test('returns to WhatsApp buttons when back button is clicked', () => {
-    render(<ItemCard item={mockItem} />);
+    render(<ItemCard item={mockItem} country="peru" />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);

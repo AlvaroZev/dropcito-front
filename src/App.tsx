@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import './App.css';
 import TiendaPage from './pages/TiendaPage';
 
+export type Country = 'peru' | 'argentina';
+
 function App() {
   const [currentPage, setCurrentPage] = useState('tienda');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>('peru');
 
   const renderPage = () => {
     switch (currentPage) {
@@ -14,8 +17,12 @@ function App() {
       case 'contactanos':
         return <div className="page-content contactanos-page">Contactanos Page</div>;
       default:
-        return <TiendaPage />;
+        return <TiendaPage selectedCountry={selectedCountry} />;
     }
+  };
+
+  const toggleCountry = () => {
+    setSelectedCountry(selectedCountry === 'peru' ? 'argentina' : 'peru');
   };
 
   const handleNavClick = (page: string) => {
@@ -64,6 +71,16 @@ function App() {
             onClick={() => handleNavClick('contactanos')}
           >
             Contactanos
+          </button>
+          
+          {/* Country Selector Button */}
+          <button 
+            className="country-selector-button"
+            onClick={toggleCountry}
+            aria-label={`Switch to ${selectedCountry === 'peru' ? 'Argentina' : 'Peru'}`}
+            title={`País: ${selectedCountry === 'peru' ? 'Perú' : 'Argentina'}`}
+          >
+            {selectedCountry === 'peru' ? '🇵🇪' : '🇦🇷'}
           </button>
           
           {/* Dark Theme Toggle Button */}

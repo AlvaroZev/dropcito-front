@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, memo } from "react";
 import { ShopEntry } from "../pages/TiendaPage";
+import { Country } from "../App";
 
 // 🎨 Estilos según rareza
 const estilosPorRareza: Record<string, string> = {
@@ -29,9 +30,10 @@ const FORTNITE_USERNAME = "DropCito0001";
 interface Props {
   item: ShopEntry;
   onBuy?: (item: ShopEntry) => void;
+  country: Country;
 }
 
-const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
+const ItemCard: React.FC<Props> = ({ item, onBuy, country }) => {
   const display = item.itemDisplay;
   const [timeLeft, setTimeLeft] = useState("");
   const [showWhatsApp, setShowWhatsApp] = useState(false);
@@ -40,9 +42,26 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
-  // Calculate PEN prices
-  const penPrice = display.vBucks * PAVOS_TO_PEN_RATE;
-  const penDiscountedPrice = display.vBucks * PAVOS_TO_PEN_DISCOUNTED_RATE;
+  // Memoize prices calculation
+  const prices = useMemo(() => {
+    if (country === 'argentina') {
+      // Calculate price in soles first, then convert to Argentina coins
+      const priceInSoles = display.vBucks * PAVOS_TO_PEN_DISCOUNTED_RATE;
+      const argentinaPrice = priceInSoles * 1505 / 3.37;
+      return {
+        regular: argentinaPrice,
+        discounted: argentinaPrice,
+        currency: 'ARS' as const
+      };
+    } else {
+      // Peru prices
+      return {
+        regular: display.vBucks * PAVOS_TO_PEN_RATE,
+        discounted: display.vBucks * PAVOS_TO_PEN_DISCOUNTED_RATE,
+        currency: 'PEN' as const
+      };
+    }
+  }, [country, display.vBucks]);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -79,36 +98,40 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
     return () => clearInterval(timer);
   }, [item.outDate]);
 
-  const rareza = display.rarity?.toLowerCase() || "common";
-  const estilo = estilosPorRareza[rareza] || "border-slate-700";
+  // Memoize style calculations
+  const { estilo, fixedColor, backgroundColor } = useMemo(() => {
+    const rareza = display.rarity?.toLowerCase() || "common";
+    const estilo = estilosPorRareza[rareza] || "border-slate-700";
 
-  function withAlpha(color: string, alpha: number) {
-    if (color.startsWith("#")) {
-      const r = parseInt(color.slice(1, 3), 16);
-      const g = parseInt(color.slice(3, 5), 16);
-      const b = parseInt(color.slice(5, 7), 16);
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
-    if (color.startsWith("rgb")) {
-      return color.replace(/rgba?\(([^)]+)\)/, (_, values) => {
-        const [r, g, b] = values.split(",").map((v: string) => v.trim());
+    function withAlpha(color: string, alpha: number) {
+      if (color.startsWith("#")) {
+        const r = parseInt(color.slice(1, 3), 16);
+        const g = parseInt(color.slice(3, 5), 16);
+        const b = parseInt(color.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-      });
+      }
+
+      if (color.startsWith("rgb")) {
+        return color.replace(/rgba?\(([^)]+)\)/, (_, values) => {
+          const [r, g, b] = values.split(",").map((v: string) => v.trim());
+          return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        });
+      }
+
+      return `rgba(135, 135, 135, ${alpha})`;
     }
 
-    return `rgba(135, 135, 135, ${alpha})`;
-  }
-
-  const fixedColor = withAlpha(
-    display.backgroundColor ||
+    const bgColor = display.backgroundColor ||
       display.backgroundColor2 ||
       display.color ||
       display.color2 ||
       display.color3 ||
-      "transparent",
-    0.3
-  );
+      "transparent";
+    
+    const fixedColor = withAlpha(bgColor, 0.3);
+
+    return { estilo, fixedColor, backgroundColor: bgColor };
+  }, [display.rarity, display.backgroundColor, display.backgroundColor2, display.color, display.color2, display.color3]);
 
   const handleBuyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -118,7 +141,9 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
 
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const message = `Hola! Me interesa comprar: ${display.name} - S/ ${penDiscountedPrice.toFixed(2)} PEN`;
+    const currencySymbol = country === 'argentina' ? '$' : 'S/';
+    const currencyCode = country === 'argentina' ? 'ARS' : 'PEN';
+    const message = `Hola! Me interesa comprar: ${display.name} - ${currencySymbol} ${prices.discounted.toFixed(2)} ${currencyCode}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
@@ -155,7 +180,7 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
         body: JSON.stringify({
           username: username.trim(),
           itemName: display.name,
-          itemPrice: penDiscountedPrice.toFixed(2)
+          itemPrice: prices.discounted.toFixed(2)
         }),
       });
       
@@ -181,14 +206,7 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
     <div className={`item-card ${estilo} responsive-card`}>
       <img
         style={{
-          background: `linear-gradient(to bottom, ${fixedColor}, ${
-            display.backgroundColor ||
-            display.backgroundColor2 ||
-            display.color ||
-            display.color2 ||
-            display.color3 ||
-            "transparent"
-          })`,
+          background: `linear-gradient(to bottom, ${fixedColor}, ${backgroundColor})`,
         }}
         src={display.image}
         alt={display.name}
@@ -211,8 +229,12 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
         </div>
 
         <div className="pen-prices responsive-pen-prices">
-          <p className="pen-price-regular responsive-pen-regular">S/ {penPrice.toFixed(2)}</p>
-          <p className="pen-price-discounted responsive-pen-discounted">S/ {penDiscountedPrice.toFixed(2)}</p>
+          {country === 'peru' && (
+            <p className="pen-price-regular responsive-pen-regular">S/ {prices.regular.toFixed(2)}</p>
+          )}
+          <p className="pen-price-discounted responsive-pen-discounted">
+            {country === 'argentina' ? '$' : 'S/'} {prices.discounted.toFixed(2)}
+          </p>
         </div>
 
         <p className="time-left responsive-time">
@@ -319,4 +341,4 @@ const ItemCard: React.FC<Props> = ({ item, onBuy }) => {
   );
 };
 
-export default ItemCard;
+export default memo(ItemCard);

@@ -87,7 +87,7 @@ describe('TiendaPage', () => {
   });
 
   test('renders Fortnite accounts prompt', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     // Wait for the component to load
     await screen.findByText('🛍️ Tienda de Fortnite');
@@ -98,7 +98,7 @@ describe('TiendaPage', () => {
   });
 
   test('displays first 3 accounts by default', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -112,7 +112,7 @@ describe('TiendaPage', () => {
   });
 
   test('shows "Mostrar más" button when there are more than 3 accounts', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -120,7 +120,7 @@ describe('TiendaPage', () => {
   });
 
   test('shows all accounts when "Mostrar más" is clicked', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -144,7 +144,7 @@ describe('TiendaPage', () => {
   });
 
   test('hides accounts when "Mostrar menos" is clicked', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -165,7 +165,7 @@ describe('TiendaPage', () => {
   });
 
   test('displays account numbers correctly', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -176,7 +176,7 @@ describe('TiendaPage', () => {
   });
 
   test('generates correct account names', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -191,7 +191,7 @@ describe('TiendaPage', () => {
   });
 
   test('shows username form when account is clicked', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -213,7 +213,7 @@ describe('TiendaPage', () => {
       })
     ) as jest.Mock;
 
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -251,7 +251,7 @@ describe('TiendaPage', () => {
       })
     ) as jest.Mock;
 
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -273,7 +273,7 @@ describe('TiendaPage', () => {
   });
 
   test('returns to accounts list when back button is clicked', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
@@ -290,7 +290,7 @@ describe('TiendaPage', () => {
   });
 
   test('displays click hints on account items', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage selectedCountry="peru" />);
     
     await screen.findByText('🛍️ Tienda de Fortnite');
     
