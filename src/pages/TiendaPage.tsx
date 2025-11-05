@@ -164,7 +164,7 @@ const FortniteAccountsPrompt: React.FC = () => {
       });
       
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         setSubmitStatus("success");
         setTimeout(() => {
           setShowUsernameForm(false);
