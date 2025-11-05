@@ -31,13 +31,16 @@ const mockItem : ShopEntry = {
 };
 
 describe('ItemCard', () => {
+  const mockRegularExchangeRate = 0.01955;
+  const mockDiscountedExchangeRate = 0.015;
+
   test('shows buy button initially', () => {
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     expect(screen.getByText('Comprar')).toBeInTheDocument();
   });
 
   test('shows WhatsApp button after clicking buy', () => {
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -54,7 +57,7 @@ describe('ItemCard', () => {
       writable: true
     });
 
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -69,7 +72,7 @@ describe('ItemCard', () => {
   });
 
   test('closes WhatsApp buttons when close button is clicked', () => {
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -89,7 +92,7 @@ describe('ItemCard', () => {
       writable: true
     });
 
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -110,7 +113,7 @@ describe('ItemCard', () => {
   });
 
   test('shows Fortnite friend request form after clicking Fortnite button', () => {
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -133,7 +136,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -172,7 +175,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -204,7 +207,7 @@ describe('ItemCard', () => {
       })
     ) as jest.Mock;
 
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);
@@ -228,7 +231,7 @@ describe('ItemCard', () => {
   });
 
   test('returns to WhatsApp buttons when back button is clicked', () => {
-    render(<ItemCard item={mockItem} country="peru" />);
+    render(<ItemCard item={mockItem} country="peru" regularExchangeRate={mockRegularExchangeRate} discountedExchangeRate={mockDiscountedExchangeRate} />);
     
     const buyButton = screen.getByText('Comprar');
     fireEvent.click(buyButton);

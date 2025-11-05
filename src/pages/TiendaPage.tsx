@@ -306,14 +306,67 @@ interface TiendaPageProps {
   selectedCountry: Country;
 }
 
+// Exchange rates for Peru (hardcoded)
+const PERU_DISCOUNTED_RATE = 0.015;
+const PERU_REGULAR_RATE = 0.02;
+
+// Multipliers for Argentina (applied to fetched exchange rate)
+const ARGENTINA_DISCOUNTED_MULTIPLIER = 0.0055;
+const ARGENTINA_REGULAR_MULTIPLIER = 0.006666;
+
 const TiendaPage: React.FC<TiendaPageProps> = ({ selectedCountry }) => {
   const [itemsByCategory, setItemsByCategory] = useState<Record<string, ShopEntry[]>>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [regularExchangeRate, setRegularExchangeRate] = useState<number>(PERU_REGULAR_RATE);
+  const [discountedExchangeRate, setDiscountedExchangeRate] = useState<number>(PERU_DISCOUNTED_RATE);
+  const [argentinaBaseRate, setArgentinaBaseRate] = useState<number>(1);
+
+  // Debounce search term to reduce filtering operations
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchShop();
-  }, []);
+    if (selectedCountry === 'argentina') {
+      fetchArgentinaExchangeRate();
+    } else {
+      // Use Peru rates directly
+      setRegularExchangeRate(PERU_REGULAR_RATE);
+      setDiscountedExchangeRate(PERU_DISCOUNTED_RATE);
+    }
+  }, [selectedCountry]);
+
+  useEffect(() => {
+    // Update exchange rates when Argentina base rate changes
+    if (selectedCountry === 'argentina') {
+      setRegularExchangeRate(argentinaBaseRate * ARGENTINA_REGULAR_MULTIPLIER);
+      setDiscountedExchangeRate(argentinaBaseRate * ARGENTINA_DISCOUNTED_MULTIPLIER);
+    }
+  }, [argentinaBaseRate, selectedCountry]);
+
+  const fetchArgentinaExchangeRate = async () => {
+    try {
+      const response = await fetch('https://api.bluelytics.com.ar/v2/latest');
+      if (response.ok) {
+        const data = await response.json();
+        // Extract blue.value_sell from the Bluelytics API response
+        const rate = data?.blue?.value_sell || 2500;
+        setArgentinaBaseRate(rate);
+      } else {
+        console.error("Failed to fetch Argentina exchange rate, using default value");
+        setArgentinaBaseRate(1);
+      }
+    } catch (error) {
+      console.error("Error fetching Argentina exchange rate:", error);
+      setArgentinaBaseRate(1);
+    }
+  };
 
   const fetchShop = async () => {
     try {
@@ -384,6 +437,21 @@ const TiendaPage: React.FC<TiendaPageProps> = ({ selectedCountry }) => {
     // TODO: Implement buy functionality, already implemented in ItemCard.tsx
   }, []);
 
+  // Memoize filtered categories and items to prevent unnecessary re-renders
+  const filteredCategories = useMemo(() => {
+    return Object.entries(itemsByCategory).map(([category, items]) => {
+      const filtered = items.filter((item) =>
+        item.itemDisplay.name.toLowerCase().includes(debouncedSearchTerm)
+      );
+      if (!filtered.length) return null;
+
+      return {
+        category,
+        items: filtered
+      };
+    }).filter(Boolean) as Array<{ category: string; items: ShopEntry[] }>;
+  }, [itemsByCategory, debouncedSearchTerm]);
+
   return (
     <div className="tienda-page">
       <div className="page-content">
@@ -397,6 +465,7 @@ const TiendaPage: React.FC<TiendaPageProps> = ({ selectedCountry }) => {
             type="text"
             placeholder="🔍 Buscar objeto..."
             className="search-input"
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
           />
 
@@ -404,28 +473,23 @@ const TiendaPage: React.FC<TiendaPageProps> = ({ selectedCountry }) => {
             <p className="loading-text">Cargando tienda...</p>
           ) : (
             <div className="categories-container">
-              {Object.entries(itemsByCategory).map(([category, items]) => {
-                const filtered = items.filter((item) =>
-                  item.itemDisplay.name.toLowerCase().includes(searchTerm)
-                );
-                if (!filtered.length) return null;
-
-                return (
-                  <div key={category} className="category-section">
-                    <h3 className="category-title">{category}</h3>
-                    <div className="items-grid">
-                      {filtered.map((item) => (
-                        <ItemCard 
-                          key={item.offerId || item.itemDisplay.name} 
-                          item={item} 
-                          onBuy={handleBuy} 
-                          country={selectedCountry} 
-                        />
-                      ))}
-                    </div>
+              {filteredCategories.map(({ category, items }) => (
+                <div key={category} className="category-section">
+                  <h3 className="category-title">{category}</h3>
+                  <div className="items-grid">
+                    {items.map((item) => (
+                      <ItemCard 
+                        key={item.offerId || item.itemDisplay.name} 
+                        item={item} 
+                        onBuy={handleBuy} 
+                        country={selectedCountry}
+                        regularExchangeRate={regularExchangeRate}
+                        discountedExchangeRate={discountedExchangeRate}
+                      />
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           )}
         </div>

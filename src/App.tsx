@@ -8,7 +8,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('tienda');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<Country>('peru');
+  const [selectedCountry, setSelectedCountry] = useState<Country>('argentina');
 
   const renderPage = () => {
     switch (currentPage) {
@@ -80,7 +80,11 @@ function App() {
             aria-label={`Switch to ${selectedCountry === 'peru' ? 'Argentina' : 'Peru'}`}
             title={`País: ${selectedCountry === 'peru' ? 'Perú' : 'Argentina'}`}
           >
-            {selectedCountry === 'peru' ? '🇵🇪' : '🇦🇷'}
+            <img 
+              src={selectedCountry === 'peru' ? '/per.png' : '/arg.webp'} 
+              alt={selectedCountry === 'peru' ? 'Perú' : 'Argentina'}
+              className="country-flag-icon"
+            />
           </button>
           
           {/* Dark Theme Toggle Button */}
